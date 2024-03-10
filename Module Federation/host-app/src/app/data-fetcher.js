@@ -1,7 +1,7 @@
 (async function fetchData() {
   try {
     const response = await fetch(
-      "https://microservice-project-415514.df.r.appspot.com/getConfig"
+      "http://34.171.186.7:8080/getConfig"
     );
     if (!response.ok) {
       throw new Error("Failed to fetch data");
