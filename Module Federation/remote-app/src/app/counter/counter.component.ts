@@ -1,6 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component } from '@angular/core';
 import { fromEvent } from 'rxjs';
-import { Data } from 'src/model/data';
 import { IPremiumDetails } from 'src/model/ipremium-details';
 import { ISendDetails } from 'src/model/isend-details';
 import { InsuranceDetailsService } from 'src/service/insurance-details.service';
@@ -15,15 +14,10 @@ export class CounterComponent implements AfterViewInit {
   insuranceDetails: any[] = [];
   selectedInsuranceId: number = 0;
   showSelectInsuranceMessage: boolean = false;
-  private insurenceData: Data = new Data();
   private abortController: AbortController | undefined;
-  buttonText = 'click Me';
 
-  constructor(
-    private insuranceService: InsuranceDetailsService,
-    private changeDetectorRef: ChangeDetectorRef
-  ) {
-    this.createReceiveEventListener();
+  constructor(private insuranceService: InsuranceDetailsService,private changeDetectorRef: ChangeDetectorRef ) {
+    this.listenCustomEventListener();
   }
 
   ngAfterViewInit(): void {
@@ -49,16 +43,15 @@ export class CounterComponent implements AfterViewInit {
     }
   }
 
-  private createReceiveEventListener() {
+  private listenCustomEventListener() {
     if (this.abortController == undefined) {
       this.abortController = new AbortController();
     }
     fromEvent(window, 'customEvent').subscribe((events: any) => {
       const userPaidEmiInfo = this.generatePremiumDetail(events.detail);
-      this.updatePremiumInDB(userPaidEmiInfo);
+      this.updatePremiumInWeb(userPaidEmiInfo);
       if (this.abortController) {
         this.abortController.abort();
-        this.createReceiveEventListener();
       }
     });
   }
@@ -89,11 +82,6 @@ export class CounterComponent implements AfterViewInit {
       paymentStatus: 'Paid',
     };
     return paidPremiumDetail;
-  }
-
-  private updatePremiumInDB(userPaidEmiInfo: any) {
-    this.insurenceData.setInsuranceInfo(userPaidEmiInfo);
-    this.updatePremiumInWeb(userPaidEmiInfo);
   }
 
   private updatePremiumInWeb(userPaidEmiInfo: any) {
